@@ -24,9 +24,52 @@ class Main {
         ClientCredentials clientCredentials = spotifyApi.clientCredentials().build().execute();
         spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 
-        Scanner sc = new Scanner(System.in);
+        Scanner sc1 = new Scanner(System.in);
+
+      //Teste de métodos getTempo
+
+      while (true) {
+            System.out.println("Tempo da musica em minutos: ");
+            float tempoMusica = (float) sc1.nextFloat();
+            Musica musica1 = new Musica(tempoMusica, "nome");
+
+            System.out.println("Escolha a opção de tempo da música: ");
+            System.out.println("1 - milissegundos");
+            System.out.println("2 - segundos");
+            System.out.println("3 - minutos");
+            int opcao = sc1.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    System.out.println(musica1.getTempo());
+                    break;
+                case 2:
+                    System.out.println(musica1.getTempoEmSegundos());
+                    break;
+                case 3:
+                    System.out.println(musica1.getTempoEmMinutos());
+                    break;
+                default:
+                    System.out.println("Opção Inválida!");
+                    break;
+            }
+            
+            System.out.println("Deseja continuar? ");
+            System.out.println("1 - Sim ");
+            System.out.println("2 - Não ");
+            int continuarScanner = sc1.nextInt();
+            if (continuarScanner==1) {
+                continue;
+            } else {
+                break;
+            }
+          }
+
+        // Coletar o artista cujos dados são necessários
+        Scanner sc2 = new Scanner(System.in);
         System.out.print("Digite o artista: ");
-        String artista = sc.nextLine();
+        String artista = sc2.nextLine();
+        System.out.println("--------------------------------------------");
 
         SearchArtistsRequest getArtistRequest = spotifyApi.searchArtists(artista).build();
         Artist busca = getArtistRequest.execute().getItems()[0];
@@ -41,23 +84,30 @@ class Main {
             musicas.add(musica);
         }
         for (Musica musica : musicas) {
-          System.out.println(musica);
-        } 
+          System.out.println(musica.getNome());
+        }
+
+        System.out.println("--------------------------------------------"); 
       
-      float distancia = 100000f;
-      float tempo = (float) 0;
-      float velocidade = 10;
+      Scanner sc3 = new Scanner(System.in);
+      System.out.println("Qual o ponto de origem?");
+      String origem = sc3.nextLine();
+      System.out.println("Qual o ponto de destino?");
+      String destino = sc3.nextLine();
+
+      RouteCalculator calculadorDistancia = new RouteCalculator(origem,destino); 
+      
+      System.out.println("Qual a velocidade em km/h?");
+      double velocidade = sc3.nextDouble();
 
       for(Musica musica : musicas){
-          Calculador calculador = new Calculador(musica,distancia);
-          System.out.println(calculador.numeroMusicas(10));
-          tempo = tempo + musica.getTempoEmSegundos();
+          CalculadorMusica calculador = new CalculadorMusica(calculadorDistancia.getDistance(), musica);
+          System.out.println("O seu trajeto equivale a "+calculador.getCalculoMusicas(velocidade)+" vezes a música "+ musica.getNome());
       }
-      float mediaTempoMusicas = (float) tempo/10;  
-      float deslocamento = (float) distancia/velocidade;
-      float mediaMusicas = (float) deslocamento/mediaTempoMusicas;
-      int resultado = (int) mediaMusicas;
+        
+      CalculadorMedia media = new CalculadorMedia(calculadorDistancia.getDistance(), musicas);
       
-      System.out.println ("O usuario podera ouvir uma media de "+resultado+" musicas do artista "+ busca.getName()+ " em seu trajeto.");
+      System.out.println("--------------------------------------------");
+      System.out.println ("Você poderá ouvir uma media de "+media.getCalculoMusicas(velocidade)+" musicas do artista "+ busca.getName()+ " em seu trajeto. Boa viagem!");
     }
 }
